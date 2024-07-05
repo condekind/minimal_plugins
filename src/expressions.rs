@@ -513,7 +513,7 @@ fn sum_nbrs(inputs: &[Series]) -> PolarsResult<Series> {
                     + ca_curr.get(idx - 1).unwrap_or(0)
                     + ca_rt.get(idx - 1).unwrap_or(0)
             };
-            let curr_row = ca_lf.get(idx).unwrap_or(0) + val + ca_rt.get(idx).unwrap_or(0);
+            let curr_row = ca_lf.get(idx).unwrap_or(0) + ca_rt.get(idx).unwrap_or(0);
             let next_row = if len - 1 == idx {
                 ca_lf.get(0).unwrap_or(0) + ca_curr.get(0).unwrap_or(0) + ca_rt.get(0).unwrap_or(0)
             } else {
@@ -521,7 +521,12 @@ fn sum_nbrs(inputs: &[Series]) -> PolarsResult<Series> {
                     + ca_curr.get(idx + 1).unwrap_or(0)
                     + ca_rt.get(idx + 1).unwrap_or(0)
             };
-            Some(prev_row + curr_row + next_row)
+            Some(match (val, prev_row + curr_row + next_row + val) {
+                (1, alive) if alive == 3 || alive == 4 => 1,
+                (0, alive) if alive == 3 => 1,
+                _ => 0,
+            })
+            //Some(prev_row + curr_row + next_row)
         })
         .collect_trusted();
     out.rename(ca_curr.name());
