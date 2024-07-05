@@ -1,0 +1,12 @@
+
+/.github
+/.idea
+
+*.so
+*.pyc
+target
+venv
+.venv
+*.so
+*.dll
+*.pyd
