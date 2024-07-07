@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 
 import polars as pl
 
-from minimal_plugin.utils import parse_into_expr, register_plugin, parse_version
+from minimal_plugin.utils import register_plugin, parse_version
 
 if TYPE_CHECKING:
     from polars.type_aliases import IntoExpr
@@ -196,6 +196,14 @@ def sum_nbrs(left, mid, right) -> pl.Expr:
         args=[left, mid, right],
         lib=lib,
         symbol="sum_nbrs",
+        is_elementwise=False,
+    )
+
+def iterate_life(left, mid, right) -> pl.Expr:
+    return register_plugin(
+        args=[left, mid, right],
+        lib=lib,
+        symbol="iterate_life",
         is_elementwise=False,
     )
 

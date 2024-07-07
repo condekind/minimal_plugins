@@ -1,7 +1,6 @@
 #![allow(clippy::unused_unit)]
 
 use crate::utils::binary_amortized_elementwise;
-use polars::export::num::zero;
 use std::borrow::Cow;
 use std::fmt::Write;
 
@@ -12,7 +11,9 @@ use polars_arrow::array::MutablePlString;
 use polars_core::utils::align_chunks_binary;
 
 use pyo3_polars::derive::polars_expr;
+
 //use polars::export::num::Signed;
+// Is there a difference? /\ vs \/
 use pyo3_polars::export::polars_core::export::num::Signed;
 use pyo3_polars::export::polars_core::utils::CustomIterTools;
 
@@ -496,6 +497,41 @@ fn sum_nbrs_above(inputs: &[Series]) -> PolarsResult<Series> {
 
 #[polars_expr(output_type=Int64)]
 fn sum_nbrs(inputs: &[Series]) -> PolarsResult<Series> {
+    // The sum of neighbours includes the value itself
+    let (left, curr, right) = (&inputs[0], &inputs[1], &inputs[2]);
+    let (ca_lf, ca_curr, ca_rt) = (left.i64()?, curr.i64()?, right.i64()?);
+    let len = ca_curr.len();
+
+    let mut out: Int64Chunked = ca_curr
+        .into_no_null_iter()
+        .enumerate()
+        .map(|(idx, val)| {
+            let prev_row = if 0 == idx {
+                ca_lf.get(len - 1).unwrap_or(0)
+                    + ca_curr.get(len - 1).unwrap_or(0)
+                    + ca_rt.get(len - 1).unwrap_or(0)
+            } else {
+                ca_lf.get(idx - 1).unwrap_or(0)
+                    + ca_curr.get(idx - 1).unwrap_or(0)
+                    + ca_rt.get(idx - 1).unwrap_or(0)
+            };
+            let curr_row = ca_lf.get(idx).unwrap_or(0) + val + ca_rt.get(idx).unwrap_or(0);
+            let next_row = if len - 1 == idx {
+                ca_lf.get(0).unwrap_or(0) + ca_curr.get(0).unwrap_or(0) + ca_rt.get(0).unwrap_or(0)
+            } else {
+                ca_lf.get(idx + 1).unwrap_or(0)
+                    + ca_curr.get(idx + 1).unwrap_or(0)
+                    + ca_rt.get(idx + 1).unwrap_or(0)
+            };
+            Some(prev_row + curr_row + next_row)
+        })
+        .collect_trusted();
+    out.rename(ca_curr.name());
+    Ok(out.into_series())
+}
+
+#[polars_expr(output_type=Int64)]
+fn iterate_life(inputs: &[Series]) -> PolarsResult<Series> {
     let (left, curr, right) = (&inputs[0], &inputs[1], &inputs[2]);
     let (ca_lf, ca_curr, ca_rt) = (left.i64()?, curr.i64()?, right.i64()?);
     let len = ca_curr.len();

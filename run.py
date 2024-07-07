@@ -1,3 +1,4 @@
+import pprint
 from itertools import tee, islice
 import polars as pl
 import minimal_plugin as mp
@@ -141,7 +142,6 @@ df = pl.DataFrame(
 ).select(abc=pl.struct("a", "b", "c"))
 print(df.with_columns(abc_shifted=mp.shift_struct("abc")))
 
-import pprint
 pprint.pprint(df.with_columns(abc_shifted=mp.shift_struct("abc")).schema)
 print('')
 
@@ -211,10 +211,10 @@ def nwise(iterable, n):
 colnums = nwise([f'{idx:02}' for idx in range(len(life_board))], 3)
 
 # colnames: ['00_01_02', '01_02_03', '02_03_04', ... ]
-colnames = ['_'.join(cols) for cols in colnums]
+colnames = [cols[1] for cols in colnums]
 
 # colvalues: [<Expr ['col("00")./home/…'] at 0x7B7C253C7E60>, ... ]
-colvalues = [mp.sum_nbrs(*tuple(cols)) for cols in colnums]
+colvalues = [mp.iterate_life(*tuple(cols)) for cols in colnums]
 
 with pl.Config(tbl_rows=-1, tbl_cols=-1):
     df = pl.DataFrame(life_board)
