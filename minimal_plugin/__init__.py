@@ -17,6 +17,7 @@ if parse_version(pl.__version__) < parse_version("0.20.16"):
 else:
     lib = Path(__file__).parent
 
+
 def pig_latinnify(expr: IntoExpr) -> pl.Expr:
     return register_plugin(
         args=[expr],
@@ -24,6 +25,7 @@ def pig_latinnify(expr: IntoExpr) -> pl.Expr:
         is_elementwise=True,
         lib=lib,
     )
+
 
 def noop(expr: IntoExpr) -> pl.Expr:
     return register_plugin(
@@ -33,6 +35,7 @@ def noop(expr: IntoExpr) -> pl.Expr:
         is_elementwise=True,
     )
 
+
 def abs_i64(expr: IntoExpr) -> pl.Expr:
     return register_plugin(
         args=[expr],
@@ -40,6 +43,7 @@ def abs_i64(expr: IntoExpr) -> pl.Expr:
         symbol="abs_i64",
         is_elementwise=True,
     )
+
 
 def abs_numeric(expr: IntoExpr) -> pl.Expr:
     return register_plugin(
@@ -49,6 +53,7 @@ def abs_numeric(expr: IntoExpr) -> pl.Expr:
         is_elementwise=True,
     )
 
+
 def sum_i64(expr: IntoExpr, other: IntoExpr) -> pl.Expr:
     return register_plugin(
         args=[expr, other],
@@ -57,6 +62,7 @@ def sum_i64(expr: IntoExpr, other: IntoExpr) -> pl.Expr:
         is_elementwise=True,
     )
 
+
 def sum_numeric(expr: IntoExpr, other: IntoExpr) -> pl.Expr:
     return register_plugin(
         args=[expr, other],
@@ -64,6 +70,7 @@ def sum_numeric(expr: IntoExpr, other: IntoExpr) -> pl.Expr:
         symbol="sum_numeric",
         is_elementwise=True,
     )
+
 
 # Not element wise!
 def cum_sum(expr: IntoExpr) -> pl.Expr:
@@ -74,6 +81,7 @@ def cum_sum(expr: IntoExpr) -> pl.Expr:
         is_elementwise=False,
     )
 
+
 def pig_latinnify_bad(expr: IntoExpr) -> pl.Expr:
     return register_plugin(
         args=[expr],
@@ -81,6 +89,7 @@ def pig_latinnify_bad(expr: IntoExpr) -> pl.Expr:
         symbol="pig_latinnify_bad",
         is_elementwise=True,
     )
+
 
 def pig_latinnify_ok(expr: IntoExpr) -> pl.Expr:
     return register_plugin(
@@ -90,6 +99,7 @@ def pig_latinnify_ok(expr: IntoExpr) -> pl.Expr:
         is_elementwise=True,
     )
 
+
 def snowball_stem(expr: IntoExpr) -> pl.Expr:
     return register_plugin(
         args=[expr],
@@ -97,6 +107,7 @@ def snowball_stem(expr: IntoExpr) -> pl.Expr:
         symbol="snowball_stem",
         is_elementwise=True,
     )
+
 
 def abs_i64_fast(expr: IntoExpr) -> pl.Expr:
     return register_plugin(
@@ -106,6 +117,7 @@ def abs_i64_fast(expr: IntoExpr) -> pl.Expr:
         is_elementwise=True,
     )
 
+
 def sum_i64_fast(expr: IntoExpr, other: IntoExpr) -> pl.Expr:
     return register_plugin(
         args=[expr, other],
@@ -113,6 +125,7 @@ def sum_i64_fast(expr: IntoExpr, other: IntoExpr) -> pl.Expr:
         symbol="sum_i64_fast",
         is_elementwise=True,
     )
+
 
 def add_suffix(expr: IntoExpr, *, suffix: str) -> pl.Expr:
     return register_plugin(
@@ -123,6 +136,7 @@ def add_suffix(expr: IntoExpr, *, suffix: str) -> pl.Expr:
         kwargs={"suffix": suffix},
     )
 
+
 def weighted_mean(expr: IntoExpr, weights: IntoExpr) -> pl.Expr:
     return register_plugin(
         args=[expr, weights],
@@ -130,6 +144,7 @@ def weighted_mean(expr: IntoExpr, weights: IntoExpr) -> pl.Expr:
         symbol="weighted_mean",
         is_elementwise=True,
     )
+
 
 def non_zero_indices(expr: IntoExpr) -> pl.Expr:
     return register_plugin(
@@ -139,6 +154,7 @@ def non_zero_indices(expr: IntoExpr) -> pl.Expr:
         is_elementwise=True,
     )
 
+
 def shift_struct(expr: IntoExpr) -> pl.Expr:
     return register_plugin(
         args=[expr],
@@ -146,6 +162,7 @@ def shift_struct(expr: IntoExpr) -> pl.Expr:
         symbol="shift_struct",
         is_elementwise=True,
     )
+
 
 def reverse_geocode(lat: IntoExpr, long: IntoExpr) -> pl.Expr:
     return register_plugin(
@@ -155,6 +172,7 @@ def reverse_geocode(lat: IntoExpr, long: IntoExpr) -> pl.Expr:
         is_elementwise=True,
     )
 
+
 def sum_of_row(*expr) -> pl.Expr:
     return register_plugin(
         args=list(expr),
@@ -162,6 +180,7 @@ def sum_of_row(*expr) -> pl.Expr:
         symbol="sum_of_row",
         is_elementwise=True,
     )
+
 
 """
 # Impl. panics
@@ -174,6 +193,7 @@ def sum_8_neighbors(*expr) -> pl.Expr:
     )
 """
 
+
 def sum_row_above(expr) -> pl.Expr:
     # Note: didn't see a difference passing expr vs [expr]
     return register_plugin(
@@ -183,6 +203,7 @@ def sum_row_above(expr) -> pl.Expr:
         is_elementwise=False,
     )
 
+
 def sum_nbrs_above(left, mid, right) -> pl.Expr:
     return register_plugin(
         args=[left, mid, right],
@@ -190,6 +211,7 @@ def sum_nbrs_above(left, mid, right) -> pl.Expr:
         symbol="sum_nbrs_above",
         is_elementwise=False,
     )
+
 
 def sum_nbrs(left, mid, right) -> pl.Expr:
     return register_plugin(
@@ -199,6 +221,7 @@ def sum_nbrs(left, mid, right) -> pl.Expr:
         is_elementwise=False,
     )
 
+
 def iterate_life(left, mid, right) -> pl.Expr:
     return register_plugin(
         args=[left, mid, right],
@@ -206,39 +229,3 @@ def iterate_life(left, mid, right) -> pl.Expr:
         symbol="iterate_life",
         is_elementwise=False,
     )
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
