@@ -549,7 +549,10 @@ fn iterate_life(inputs: &[Series]) -> PolarsResult<Series> {
                     + ca_curr.get(idx - 1).unwrap_or(0)
                     + ca_rt.get(idx - 1).unwrap_or(0)
             };
+
+            // Curr row does not include cell in the middle, a cell is not a neighbour of itself
             let curr_row = ca_lf.get(idx).unwrap_or(0) + ca_rt.get(idx).unwrap_or(0);
+
             let next_row = if len - 1 == idx {
                 ca_lf.get(0).unwrap_or(0) + ca_curr.get(0).unwrap_or(0) + ca_rt.get(0).unwrap_or(0)
             } else {
@@ -557,12 +560,13 @@ fn iterate_life(inputs: &[Series]) -> PolarsResult<Series> {
                     + ca_curr.get(idx + 1).unwrap_or(0)
                     + ca_rt.get(idx + 1).unwrap_or(0)
             };
+
+            // Life logic
             Some(match (val, prev_row + curr_row + next_row + val) {
                 (1, alive) if alive == 3 || alive == 4 => 1,
                 (0, alive) if alive == 3 => 1,
                 _ => 0,
             })
-            //Some(prev_row + curr_row + next_row)
         })
         .collect_trusted();
     out.rename(ca_curr.name());

@@ -1,5 +1,7 @@
 import pprint
+import sys
 from itertools import tee, islice
+from time import sleep
 import polars as pl
 import minimal_plugin as mp
 from minimal_plugin import pig_latinnify, noop, abs_i64, abs_numeric, sum_i64, sum_numeric, cum_sum
@@ -216,6 +218,11 @@ colnames = [cols[1] for cols in colnums]
 # colvalues: [<Expr ['col("00")./home/…'] at 0x7B7C253C7E60>, ... ]
 colvalues = [mp.iterate_life(*tuple(cols)) for cols in colnums]
 
+print('Life board it. #0')
+with (pl.Config(tbl_rows=-1, tbl_cols=-1)):
+    print(pl.DataFrame(life_board))
+
+print('Life board it. #1')
 with pl.Config(tbl_rows=-1, tbl_cols=-1):
     df = pl.DataFrame(life_board)
     result = df.with_columns(
@@ -223,8 +230,25 @@ with pl.Config(tbl_rows=-1, tbl_cols=-1):
     )
     print(result)
 
-# Question: how to expand kwargs in with_columns with keys:values?
-
+# Default iteration count
+IT_CNT = 16
+# Default delay between iterations
+DELAY = 0.5
+with (pl.Config(tbl_rows=-1, tbl_cols=-1)):
+    df = pl.DataFrame(life_board)
+    cnt = 1
+    try:
+        for it_cnt in range(int(sys.argv[1]) if len(sys.argv) > 1 else IT_CNT):
+            df = df.with_columns(
+                **dict(zip(colnames, colvalues)),
+            )
+            # Clear screen
+            print('\033[2J')
+            print(df)
+            cnt += 1
+            sleep(float(sys.argv[2]) if len(sys.argv) > 2 else DELAY)
+    except KeyboardInterrupt:
+        print(f'\nKeyboard Interrupt: ran for {cnt} iterations. Aborting...')
 
 
 
